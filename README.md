@@ -7,7 +7,7 @@
 - 后台地址:http://admin.suibianba.cn/
 - 账号/密码:test
 - 后台页面仓库地址 https://gitee.com/shican1234/chatgpt-admin-ui.git
-- UNIAPP仓库地址 https://gitee.com/shican1234/chatgpt-uniapp.git
+- UNIAPP仓库地址 https://gitee.com/shican1234/quanzi-uniapp.git
 
 <br>
 
