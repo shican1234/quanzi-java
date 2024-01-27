@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.circle.dao.CircleDao">
+
+
+    <select id="queryCircleByClass" resultType="io.renren.common.modules.circle.entity.CircleEntity"
+            parameterType="io.renren.common.dto.CircleByClassDto">
+        select
+            tc.*,
+        (SELECT IFNULL(COUNT(*),0) from tb_post WHERE circle_id = tc.id) AS postCount,
+        (SELECT IFNULL(COUNT(*),0) from tb_circle_user WHERE circle_id = tc.id) AS peopleCount
+        from
+            tb_circle tc
+        WHERE
+        tc.status = 1 and privacy_type = 0
+        <if test="cid != null">
+            and tc.circle_class_id = #{cid}
+        </if>
+        <if test="hotOk != null">
+            and tc.hot_ok = #{hotOk}
+        </if>
+        order By tc.time desc
+        limit #{page},10
+    </select>
+    <select id="hotCircleList" resultType="io.renren.common.modules.circle.entity.CircleEntity">
+        select
+        tc.*,
+        (SELECT IFNULL(COUNT(*),0) from tb_post WHERE circle_id = tc.id) AS postCount,
+        (SELECT IFNULL(COUNT(*),0) from tb_circle_user WHERE circle_id = tc.id) AS peopleCount
+        from
+        tb_circle tc
+        WHERE
+        tc.status = 1
+        and tc.hot_ok = 1 and privacy_type = 0
+        order By peopleCount desc
+    </select>
+    <select id="searchCircle" resultType="io.renren.common.modules.circle.entity.CircleEntity"
+            parameterType="io.renren.common.dto.SearchDTO">
+        select
+            tc.*,
+            (SELECT IFNULL(COUNT(*),0) from tb_post WHERE circle_id = tc.id) AS postCount,
+            (SELECT IFNULL(COUNT(*),0) from tb_circle_user WHERE circle_id = tc.id) AS peopleCount
+        from
+            tb_circle tc
+        WHERE
+            tc.status = 1 and circle_name like concat('%', #{keyword}, '%') or id = #{keyword}
+        order By `time` desc
+        limit #{page},10
+    </select>
+</mapper>

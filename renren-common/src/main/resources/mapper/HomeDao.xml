@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.dao.HomeDao">
+
+    <select id="queryUser" resultType="io.renren.common.dto.UserCountDto">
+        SELECT
+            COUNT(  CASE WHEN DATE ( create_time ) = CURDATE() THEN 1 END ) AS today_user,
+            COUNT(  CASE WHEN WEEK(create_time, 1) = WEEK(CURDATE(), 1) AND YEAR ( create_time ) = YEAR ( CURDATE()) THEN 1 END ) AS this_wek_user,
+            COUNT(  CASE WHEN DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(now(),'%Y-%m') THEN 1 END ) AS this_mon_user ,
+            COUNT(*) as all_user
+        FROM
+            tb_user
+    </select>
+    <select id="queryPay" resultType="io.renren.common.dto.PayCountDto">
+        SELECT
+            IFNULL( SUM( IF(DATE(found_time) = CURDATE(),recharge_amount,NULL) ), 0 ) as today_pay_sum,
+            IFNULL( SUM( IF(WEEK(found_time, 1) = WEEK(CURDATE(), 1) AND YEAR ( found_time ) = YEAR ( CURDATE()),recharge_amount,NULL) ), 0 ) as this_wek_pay_sum,
+            IFNULL( SUM( IF(DATE_FORMAT(found_time, '%Y-%m') = DATE_FORMAT(now(),'%Y-%m'),recharge_amount,NULL) ), 0 ) as this_mon_pay_sum,
+            IFNULL( SUM( recharge_amount ), 0 ) as all_pay_sum
+        FROM
+            tb_pay_order
+        WHERE
+            order_type = 1
+    </select>
+    <select id="queryCircle" resultType="io.renren.common.dto.CircleCountDto">
+        SELECT
+            COUNT(  CASE WHEN DATE (   `time` ) = CURDATE() THEN 1 END ) AS today_circle,
+            COUNT(  CASE WHEN WEEK(  `time`, 1) = WEEK(CURDATE(), 1) AND YEAR (   `time` ) = YEAR ( CURDATE()) THEN 1 END ) AS this_wek_circle,
+            COUNT(  CASE WHEN DATE_FORMAT(  `time`, '%Y-%m') = DATE_FORMAT(now(),'%Y-%m') THEN 1 END ) AS this_mon_circle ,
+            COUNT(*) as all_circle
+        FROM
+            tb_circle
+    </select>
+    <select id="queryPost" resultType="io.renren.common.dto.PostCountDto">
+        SELECT
+            COUNT(  CASE WHEN DATE (   create_time ) = CURDATE() THEN 1 END ) AS today_post,
+            COUNT(  CASE WHEN WEEK(  create_time, 1) = WEEK(CURDATE(), 1) AND YEAR (  create_time ) = YEAR ( CURDATE()) THEN 1 END ) AS this_wek_post,
+            COUNT(  CASE WHEN DATE_FORMAT(  create_time, '%Y-%m') = DATE_FORMAT(now(),'%Y-%m') THEN 1 END ) AS this_mon_post,
+            COUNT(*) as all_post
+        FROM
+            tb_post
+    </select>
+</mapper>

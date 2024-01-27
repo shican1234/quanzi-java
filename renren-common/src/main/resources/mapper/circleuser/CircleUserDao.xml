@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.circleuser.dao.CircleUserDao">
+
+
+    <select id="myCirList" resultType="io.renren.common.modules.circle.entity.CircleEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+        SELECT
+            tc.*,
+            (SELECT IFNULL(COUNT(*),0) from tb_post WHERE circle_id = tc.id) AS postCount,
+            (SELECT IFNULL(COUNT(*),0) from tb_circle_user WHERE circle_id = tc.id) AS peopleCount
+        FROM
+            tb_circle_user tcb
+        LEFT JOIN tb_circle tc  on
+          tcb.circle_id = tc.id where tcb.user_id = #{userId} order By tcb.create_time desc limit #{page},10
+    </select>
+    <select id="queryUserListByCircle" resultType="io.renren.common.modules.circleuser.dto.CircleUserDTO"
+            parameterType="io.renren.common.dto.QueryUserListByCircleDTO">
+        SELECT
+            tcu.*,
+            tb.avatar,
+            tb.nick_name,
+            tb.gender
+        FROM
+            tb_circle_user tcu LEFT JOIN tb_user tb on tcu.user_id = tb.id
+        WHERE
+            tcu.circle_id = #{circleId}
+        ORDER BY
+            tcu.type DESC,
+            tcu.create_time DESC
+        limit #{page},10
+    </select>
+    <select id="getCreatCircleListByUserId" resultType="io.renren.common.modules.circle.entity.CircleEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+        SELECT
+            tc.*,
+            ( SELECT IFNULL( COUNT(*), 0 ) FROM tb_post WHERE circle_id = tc.id ) AS postCount,
+            ( SELECT IFNULL( COUNT(*), 0 ) FROM tb_circle_user WHERE circle_id = tc.id ) AS peopleCount
+        FROM
+            tb_circle tc
+        WHERE
+            tc.user_id = #{userId} and tc.privacy_type = 0
+        ORDER BY
+            tc.time DESC
+        LIMIT #{page},
+            10
+    </select>
+    <select id="queryJoinCirclelistByUserId" resultType="io.renren.common.modules.circle.entity.CircleEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+        SELECT
+            tc.*,
+            (SELECT IFNULL(COUNT(*),0) from tb_post WHERE circle_id = tc.id) AS postCount,
+            (SELECT IFNULL(COUNT(*),0) from tb_circle_user WHERE circle_id = tc.id) AS peopleCount
+        FROM
+            tb_circle_user tcb
+                LEFT JOIN tb_circle tc  on
+                tcb.circle_id = tc.id where tcb.user_id = #{userId} and tcb.type != 3 and tc.privacy_type = 0 order By tcb.create_time desc limit #{page},10
+    </select>
+</mapper>

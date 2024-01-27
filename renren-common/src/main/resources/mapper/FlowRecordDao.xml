@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.flowRecord.dao.FlowRecordDao">
+
+    <!-- 根据用户ID查询用户的金币流水数据 -->
+    <select id="getFlowRecordByUserId" resultType="io.renren.common.modules.flowRecord.entity.FlowRecordEntity" parameterType="map">
+        select
+
+        id,
+        code,
+        amount,
+        income,
+        away_user_id,
+        out_user_id,
+        status,
+        current_id,
+        time
+
+        from tb_flow_record
+
+        where
+
+            away_user_id = #{userId} or out_user_id = #{userId}
+
+        order by time desc
+
+        limit #{page},10
+
+    </select>
+    <select id="payRecordUserList" resultType="io.renren.common.modules.user.entity.UserEntity"
+            parameterType="io.renren.common.dto.PayRecordUserListDTO">
+        SELECT
+            tb.id,
+            tb.avatar,
+            tb.gender,
+            tb.create_time,
+            tb.nick_name,
+            tf.`time` as payTime,
+            (SELECT IFNULL(COUNT(*),0) from tb_post WHERE user_id = tb.id) AS postCount,
+            (SELECT IFNULL(COUNT(*),0) from tb_follow WHERE to_user = tb.id) AS fansCount
+        FROM
+            tb_flow_record tf
+                LEFT JOIN tb_user tb ON tf.out_user_id = tb.id
+        WHERE
+            tf.current_id =  #{tid} AND tf.`status` = #{status} ORDER BY tf.`time` desc
+        LIMIT #{page},10
+    </select>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.payOrder.dao.PayOrderDao">
+
+    <!-- 根据订单编码查询充值订单 -->
+    <select id="getPayOrderBuOrder" resultType="io.renren.common.modules.payOrder.entity.PayOrderEntity" parameterType="string">
+        select
+
+            *
+
+        from
+
+            tb_pay_order where order_code = #{orderCode} and order_type = 0
+
+    </select>
+
+    <!-- 根据用户ID查询用户支付成功的充值记录 -->
+    <select id="getPayOrderByUserId" resultType="io.renren.common.modules.payOrder.entity.PayOrderEntity" parameterType="map">
+        select
+
+            id as id,
+            order_code as orderCode,
+            recharge_amount as rechargeAmount,
+            pey_type as peyType,
+            commodity_type as commodityType,
+            found_time as foundTime
+
+        from
+
+            tb_pay_order where order_type = 1 and user_id = #{userId} order by found_time desc
+         limit #{page},10
+    </select>
+
+</mapper>

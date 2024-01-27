@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>io.renren</groupId>
+		<artifactId>renren-security</artifactId>
+		<version>5.2.0</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>renren-common</artifactId>
+	<packaging>jar</packaging>
+	<description>renren-common</description>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>cn.afterturn</groupId>
+			<artifactId>easypoi-base</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.afterturn</groupId>
+			<artifactId>easypoi-web</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.afterturn</groupId>
+			<artifactId>easypoi-annotation</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun.oss</groupId>
+			<artifactId>aliyun-sdk-oss</artifactId>
+			<version>2.8.3</version>
+		</dependency>
+		<!--	阿里云	-->
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>3.7.1</version>
+		</dependency>
+		<!--	腾讯云	-->
+		<dependency>
+			<groupId>com.qcloud</groupId>
+			<artifactId>cos_api</artifactId>
+			<version>5.4.4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!--	七牛云	-->
+		<dependency>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<version>7.2.27</version>
+		</dependency>
+		<!--	支付宝SDK	-->
+		<dependency>
+			<groupId>com.alipay.sdk</groupId>
+			<artifactId>alipay-sdk-java</artifactId>
+			<version>4.38.10.ALL</version>
+		</dependency>
+		<!--微信SDK -->
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-miniapp</artifactId>
+			<version>4.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-open</artifactId>
+			<version>4.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-pay</artifactId>
+			<version>4.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-mp</artifactId>
+			<version>4.5.0</version>
+		</dependency>
+
+		<!--	谷歌二维码包	-->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+
+	</dependencies>
+
+</project>

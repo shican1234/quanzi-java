@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.post.dao.PostDao">
+    <update id="unLike" parameterType="java.lang.Long">
+        update tb_post set
+            `dz_count` = dz_count - 1
+        where id = #{value}
+    </update>
+    <update id="like" parameterType="java.lang.Long">
+        update tb_post set
+            `dz_count` = dz_count + 1
+        where id = #{value}
+    </update>
+
+
+    <select id="selectIndex" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+
+
+        SELECT
+        tb.*,
+        ap.nick_name as nickName,
+        ap.avatar as avatar,
+        ap.vip_date as vipDate,
+        (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+        (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+        tb_post tb
+        LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+        tb.`type` = 0
+        AND tb.`status` = 1
+        AND tb.`pay_type` = 0
+
+        ORDER BY
+        tb.`create_time` DESC
+        LIMIT #{page},10
+
+    </select>
+    <select id="getPostInfo" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.LikeDto">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+            tb.`id` = #{tid}
+          AND tb.`status` != 2
+    </select>
+    <select id="queryGz" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+            tb.`type` = 0
+          AND tb.`status` = 1 and tb.user_id in (SELECT to_user FROM tb_follow WHERE from_user  = #{userId})
+
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+
+    </select>
+    <select id="queryCirclePost" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.QueryCirclePostDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT type FROM tb_circle_user where circle_id = tb.circle_id and user_id = tb.user_id) as postRole,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+           tb.`status` = 1
+          AND tb.circle_id = #{id}
+        <if test="type != null and type == 1">
+            and tb.essence = 1
+        </if>
+        <if test="type != null and type == 2">
+            and tb.user_id = #{cUid}
+        </if>
+        <if test="type != null and type == 3">
+            and tb.file_type = 0
+        </if>
+        <if test="type != null and type == 4">
+            and tb.file_type = 1
+        </if>
+        <if test="type != null and type == 5">
+            and tb.post_class = 1
+        </if>
+        <if test="type != null and type == 6">
+            and tb.pay_type > 0
+        </if>
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+    </select>
+    <select id="circleTopPost" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.QueryCirclePostDTO">
+        SELECT
+        tb.*,
+        ap.nick_name as nickName,
+        ap.avatar as avatar,
+        ap.vip_date as vipDate,
+        (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+        (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+        tb_post tb
+        LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+        tb.`type` = 0
+        AND tb.circle_id = #{id}
+        AND tb.`status` = 1
+        AND tb.topping != 0
+        ORDER BY
+        tb.`create_time` DESC
+    </select>
+    <select id="myCirListPost" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.QueryCirclePostDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+
+           tb.circle_id in (select circle_id from tb_circle_user where user_id = #{userId})
+          AND tb.`status` = 1
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+    </select>
+    <select id="queryPostListByUserId" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.PostListByUserIdDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{myUserId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+            tb.`type` = 0
+          AND tb.`status` = 1 and tb.user_id = #{userId}
+
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+    </select>
+    <select id="queryMyPostList" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.GetPostListByTypeDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+            tb.user_id = #{userId}
+
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+    </select>
+    <select id="queryMyLikePostList" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.GetPostListByTypeDTO">
+        SELECT
+            tp.*,
+            (SELECT nick_name from tb_user where id = tp.user_id)  AS nickName,
+            (SELECT vip_date  from tb_user where id = tp.user_id)  AS  vipDate,
+            (SELECT avatar from tb_user where id = tp.user_id)  AS avatar,
+            ( SELECT circle_name FROM tb_circle WHERE id = tp.circle_id ) AS circleName,
+            1 as isDz
+        FROM
+            tb_fabulous tfa
+                LEFT JOIN tb_post tp ON tfa.tid = tp.id
+        WHERE
+            tfa.type = 0
+          AND tfa.user_id = #{userId}
+        ORDER BY tfa.create_time
+    </select>
+    <select id="searchPost" resultType="io.renren.common.modules.post.entity.PostEntity"
+            parameterType="io.renren.common.dto.SearchDTO">
+        SELECT
+            tb.*,
+            ap.nick_name as nickName,
+            ap.avatar as avatar,
+            ap.vip_date as vipDate,
+            (SELECT circle_name FROM tb_circle where id = tb.circle_id) as circleName,
+            (SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = tb.id AND type = 0) as isDz
+        FROM
+            tb_post tb
+                LEFT JOIN tb_user ap ON tb.user_id = ap.id
+        WHERE
+             tb.`status` = 1 and tb.title like concat('%', #{keyword}, '%')
+        ORDER BY
+            tb.`create_time` DESC
+        LIMIT #{page},10
+    </select>
+</mapper>

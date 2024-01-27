@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.user.dao.UserDao">
+
+    <select id="getUserByMobile" resultType="io.renren.common.modules.user.entity.UserEntity">
+        select * from tb_user where mobile = #{value}
+    </select>
+
+    <select id="getUserByUserId" resultType="io.renren.common.modules.user.entity.UserEntity">
+        select * from tb_user where id = #{value}
+    </select>
+    <select id="getByEmail" resultType="io.renren.common.modules.user.entity.UserEntity"
+            parameterType="java.lang.String">
+        select * from tb_user where email = #{value}
+    </select>
+    <select id="getUserByUnionId" resultType="io.renren.common.modules.user.entity.UserEntity"
+            parameterType="java.lang.String">
+        select * from tb_user where wx_unionId = #{value}
+    </select>
+
+    <!--  根据用户ID修改用户数据 -->
+    <update id="updateUserById" parameterType="map">
+        update tb_user
+        <set>
+
+            <!-- VIP到期时间 -->
+            <if test="vipDate != null">
+                vip_date = #{vipDate},
+            </if>
+
+            <!-- 金币余额 -->
+            <if test="cion != null">
+                cion = #{cion},
+            </if>
+
+            <!-- 提现余额 -->
+            <if test="txbalance != null">
+                balance = #{txbalance},
+            </if>
+
+            <if test="balance != null">
+                balance = balance + #{balance},
+            </if>
+
+        </set>
+
+        where id= #{userId}
+
+    </update>
+
+    <!--获取我的页面关注,粉丝等数据-->
+    <select id="getDetailsNumber" resultType="io.renren.common.vo.detailsNumberVo" parameterType="long">
+        select IFNULL(COUNT(*),0) as record from tb_follow where from_user = #{userId}  -- 关注
+        union all
+        select IFNULL(COUNT(*),0)  as record from tb_circle_user where user_id = #{userId}  -- 我的圈子数量
+        union all
+        select IFNULL(COUNT(*),0)  as record from tb_post where user_id = #{userId}  -- 我发的帖子数量
+        union all
+        select IFNULL(sum(dz_count),0) as record from tb_post where user_id = #{userId}  -- 我发帖子点赞数量
+        union all
+        select IFNULL(sum(like_num),0) as record from tb_comment where comment_user_id = #{userId} --  我的评论点赞数量
+        union all
+        select IFNULL(COUNT(*),0)  as record from tb_follow where to_user = #{userId} --  粉丝
+
+    </select>
+
+    <!--  根据用户ID查询用户所有下级 -->
+    <select id="getUserByPid" resultType="io.renren.common.modules.user.entity.UserEntity" parameterType="long">
+        select * from tb_user where pid = #{value}
+    </select>
+
+    <!--  根据用户ID查询用户所有下级 -->
+    <select id="querySubordinateList" resultType="io.renren.common.modules.user.entity.UserEntity" parameterType="map">
+        select nick_name,create_time,avatar from tb_user where pid = #{userId}  order by create_time desc  <!--  limit #{pageNum},10 -->
+    </select>
+
+
+    <!--  查询账号是否已被绑定 -->
+    <select id="queryaccountnumber" resultType="io.renren.common.modules.user.entity.UserEntity" parameterType="map">
+        select
+
+            *
+
+        from tb_user
+
+        where 1 = 1
+
+        <if test="type == 1">
+            and mobile = #{accountNumber}
+        </if>
+
+        <if test="type == 2">
+            and email = #{accountNumber}
+        </if>
+
+
+    </select>
+    <select id="hotBlogger" resultType="io.renren.common.modules.user.entity.UserEntity"
+            parameterType="io.renren.common.dto.PageDTO">
+        SELECT tb.id,
+               tb.avatar,
+               tb.gender,
+               tb.create_time,
+               tb.nick_name,
+               (SELECT IFNULL(COUNT(*),0) from tb_post WHERE user_id = tb.id) AS postCount,
+               (SELECT IFNULL(COUNT(*),0) from tb_follow WHERE to_user = tb.id) AS fansCount
+        from tb_user tb
+        ORDER BY fansCount desc
+        LIMIT #{page},10
+    </select>
+    <select id="searchUser" resultType="io.renren.common.modules.user.entity.UserEntity"
+            parameterType="io.renren.common.dto.SearchDTO">
+        SELECT tb.id,
+               tb.avatar,
+               tb.gender,
+               tb.create_time,
+               tb.nick_name,
+               (SELECT IFNULL(COUNT(*),0) from tb_post WHERE user_id = tb.id) AS postCount,
+               (SELECT IFNULL(COUNT(*),0) from tb_follow WHERE to_user = tb.id) AS fansCount
+        from tb_user tb where tb.id like concat('%', #{keyword}, '%') or tb.nick_name like concat('%', #{keyword}, '%')
+        ORDER BY fansCount desc
+        LIMIT #{page},10
+    </select>
+
+</mapper>

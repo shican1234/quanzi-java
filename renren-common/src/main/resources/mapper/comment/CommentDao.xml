@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.common.modules.comment.dao.CommentDao">
+    <update id="like" parameterType="java.lang.Long">
+        update tb_comment set
+            `like_num` = like_num + 1
+        where id = #{value}
+    </update>
+    <update id="unLike" parameterType="java.lang.Long">
+        update tb_comment set
+            `like_num` = like_num - 1
+        where id = #{value}
+    </update>
+
+    <select id="getComment" resultType="io.renren.common.vo.CommentListVo"
+            parameterType="io.renren.common.dto.LikeDto">
+
+        SELECT
+            c.id as id,
+            c.comment_user_id,
+            c.like_num,
+            u.avatar as avatar_url,
+            u.nick_name,
+            IF((SELECT IFNULL(COUNT(1),0) from tb_fabulous WHERE user_id = #{userId} AND tid = c.id AND type = 1)>0,true,false) as hasLike,
+            IF(c.comment_user_id = #{userId},true,false)  owners,
+            c.content,
+            c.parent_id,
+            c.create_time
+        FROM
+            tb_comment c
+                LEFT JOIN tb_user u ON c.comment_user_id = u.id
+        WHERE
+            c.tid = #{tid}
+          AND c.`status` in (0,1)
+
+    </select>
+</mapper>
