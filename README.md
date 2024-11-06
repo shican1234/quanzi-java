@@ -3,8 +3,8 @@
 - 开发脚手架基于人人开源 https://gitee.com/renrenio/renren-security
 - java开发的私密圈子小程序  前端使用uniapp   可打包多端运行  APP  H5  公众号  小程序等 ,三级分销,卡密充值,私密圈,付费圈,付费贴,红包贴等
 - 具体功能看演示(演示为商业版本)
-- 演示地址：https://bbs.suibianba.cn
-- 后台地址:http://admin.suibianba.cn/
+- 演示地址：http://qinyuansc.top
+- 后台地址:http://admin.qinyuansc.top
 - 账号/密码:test
 - 后台页面仓库地址 https://github.com/shican1234/quanzi-admin.git
 - UNIAPP仓库地址 https://github.com/shican1234/quanzi-uniapp.git
